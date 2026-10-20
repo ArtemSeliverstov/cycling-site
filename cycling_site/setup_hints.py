@@ -5,6 +5,8 @@ and many leave right there, never learning that the site can be fitted to them. 
 so, once, in a single line under the menu:
 
 * not signed in -- sign in, on every page, and it cannot be closed;
+* email not confirmed -- until it is, entering races, adding events and commenting are closed, so
+  this one cannot be closed either;
 * no calendar preferences -- only on the calendar, list and map, where they change what is shown;
 * no name, gender or date of birth -- what a race entry needs;
 * only one way to sign in -- losing it locks the member out;
@@ -75,6 +77,10 @@ def current_hint(request) -> dict | None:
             "login_url": f"{reverse('account_login')}?{urlencode({'next': request.get_full_path()})}",
             "signup_url": reverse("account_signup"),
         }
+    from accounts.access import needs_email_confirmation
+
+    if needs_email_confirmation(user):
+        return {"key": "confirm_email", "url": reverse("account_profile")}
     dismissed = set(user.dismissed_hints or [])
     checks = (
         (
@@ -91,5 +97,5 @@ def current_hint(request) -> dict | None:
         # get that far down the list on a given page.
         if key in dismissed or is_done():
             continue
-        return {"key": key, "url": url}
+        return {"key": key, "url": url, "dismissible": True}
     return None
