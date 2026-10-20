@@ -4,7 +4,7 @@ No close cross: the sign-in hint cannot be closed at all, and turning a member's
 link and a confirmation, so it is not swept away by reflex. data-nosnippet keeps the sign-in line,
 which a crawler sees on every page, out of search results.{% endcomment %}
 {% if setup_hint %}
-<div class="alert alert-info border shadow-sm py-2 d-flex flex-wrap align-items-center gap-2" id="setup-hint"
+<div class="alert alert-info border shadow-sm py-2 d-flex flex-wrap align-items-center gap-2" id="setup-hint" data-hint="{{ setup_hint.key }}"
      role="region" aria-label="{% trans 'Set the site up for yourself' %}"{% if setup_hint.key == "sign_in" %} data-nosnippet{% endif %}>
     <span class="flex-grow-1">
         {% if setup_hint.key == "sign_in" %}{% trans "Sign in, and the calendar fits you: only your sports and your city, favourites, and entering races in one click." %}
