@@ -490,3 +490,26 @@ def set_language(request):
                 )
 
     return response
+
+
+class DismissHintView(LoginRequiredMixin, View):
+    """Turn one setup reminder off for good (issue #319). Only that one: the next still shows."""
+
+    def post(self, request, key):
+        from django.http import Http404
+        from django.utils.http import url_has_allowed_host_and_scheme
+
+        from cycling_site.setup_hints import DISMISSIBLE
+
+        if key not in DISMISSIBLE:
+            raise Http404
+        user = request.user
+        if key not in (user.dismissed_hints or []):
+            user.dismissed_hints = [*(user.dismissed_hints or []), key]
+            user.save(update_fields=["dismissed_hints"])
+        nxt = request.POST.get("next", "")
+        if not url_has_allowed_host_and_scheme(
+            nxt, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            nxt = "/"
+        return redirect(nxt)

@@ -57,7 +57,7 @@
                        class="form-control{% if form.city.errors %} is-invalid{% endif %}">
                 <div class="form-text">{% trans "Prefilled when you register for an event." %}</div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3" id="strava-link">
                 <label class="form-label">{% trans "Strava link" %}</label>
                 {{ form.strava_link.errors }}
                 <input type="url" name="strava_link" value="{{ form.strava_link.value|default:'' }}"
@@ -66,7 +66,7 @@
                 <div class="form-text">{% trans "Prefilled into the registration field for events that collect Strava links." %}</div>
             </div>
             <hr>
-            <h2 class="h5 mb-3">{% trans "Calendar defaults" %}</h2>
+            <h2 class="h5 mb-3" id="calendar-defaults">{% trans "Calendar defaults" %}</h2>
             {% include "accounts/_preference_pickers.html" %}
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
             <a href="{% url 'account_profile' %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>

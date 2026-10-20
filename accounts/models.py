@@ -61,6 +61,9 @@ class User(AbstractUser):  # type: ignore[django-manager-missing]
         "calendar_app.Discipline", blank=True, related_name="preferring_users"
     )
     preferred_locations = models.ManyToManyField("locations.Location", blank=True, related_name="preferring_users")
+    # Setup hints (issue #319) this member asked never to see again. A list of hint keys rather than a
+    # flag, so turning one reminder off does not silence the next one.
+    dismissed_hints = models.JSONField(default=list, blank=True)
     # Timestamp of the last rate-limited outgoing mail action (confirmation email at
     # signup/resend and the contact-owners message). Shared cooldown across all of them.
     last_mail_action_at = models.DateTimeField(null=True, blank=True)

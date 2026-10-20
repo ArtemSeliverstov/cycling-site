@@ -179,6 +179,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "cycling_site.context_processors.moderation_tasks",
+                "cycling_site.context_processors.setup_hint",
             ],
         },
     },
