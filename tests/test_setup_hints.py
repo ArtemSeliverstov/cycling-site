@@ -146,3 +146,27 @@ class DismissTests(TestCase):
         response = self._dismiss("preferences")
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response["Location"])
+
+
+class TranslationTests(TestCase):
+    MSGIDS = (
+        "Sign in, and the calendar fits you: only your sports and your city, favourites, and entering races "
+        "in one click.",
+        "Choose your sports and places in your profile, and the calendar, list and map will open with only them.",
+        "Add your name, gender and date of birth to your profile: race entries will be filled in for you.",
+        "Your account has only one way to sign in. Add a second one, so losing it does not lock you out.",
+        "Add your Strava profile link: races that ask for it will take it from your entry.",
+        "Choose",
+        "Fill in",
+        "Do not remind me again",
+        "Set the site up for yourself",
+        "Stop this reminder for good? You can still change it in your profile at any time.",
+    )
+
+    def test_every_hint_is_translated(self):
+        from django.utils.translation import gettext, override
+
+        for msgid in self.MSGIDS:
+            for lang in ("ru", "kk"):
+                with self.subTest(msgid=msgid[:30], lang=lang), override(lang):
+                    self.assertNotEqual(gettext(msgid), msgid)
