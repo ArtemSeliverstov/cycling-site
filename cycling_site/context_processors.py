@@ -92,3 +92,13 @@ def _knowledge_index_url() -> str:
 
     index = KnowledgeIndexPage.objects.live().first()
     return index.url if index else "/"
+
+
+def setup_hint(request):
+    """The single setup hint for this page (issue #319); see cycling_site.setup_hints."""
+    from cycling_site.setup_hints import current_hint
+
+    if not hasattr(request, "user"):
+        return {}
+    hint = current_hint(request)
+    return {"setup_hint": hint} if hint else {}
