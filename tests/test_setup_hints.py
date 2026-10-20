@@ -106,6 +106,24 @@ class MemberOrderTests(TestCase):
                 self.assertNotContains(self.client.get(reverse(name)), 'id="setup-hint"')
 
 
+class RaceEntryFormTests(TestCase):
+    def test_the_entry_form_is_left_to_say_what_is_missing_itself(self):
+        from django.utils import timezone
+
+        from calendar_app.models import Competition
+
+        race = Competition.objects.create(
+            title_ru="Race",
+            date_start=timezone.localdate() + datetime.timedelta(days=5),
+            status=Competition.Status.APPROVED,
+            registration_enabled=True,
+        )
+        self.client.force_login(_member())
+        response = self.client.get(reverse("registrations:register", args=[race.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="setup-hint"')
+
+
 class DismissTests(TestCase):
     def setUp(self):
         self.user = _complete(_member(), preferences=False, data=False)

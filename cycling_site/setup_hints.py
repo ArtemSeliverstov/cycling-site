@@ -33,10 +33,18 @@ def _url_name(request) -> str:
     return (match.url_name or "") if match else ""
 
 
-def _on_account_pages(request) -> bool:
-    """Sign-in, sign-up and the profile itself: the hint would point at the page it is on."""
-    name = _url_name(request)
-    return name.startswith(("account_", "socialaccount_"))
+def _quiet_here(request) -> bool:
+    """Pages where a hint would only repeat the page.
+
+    Sign-in, sign-up and the profile: the hint would point at the page it is on. The race entry
+    form: it already names what the profile is missing, right above its own button.
+    """
+    match = getattr(request, "resolver_match", None)
+    if match is None:
+        return False
+    return (match.url_name or "").startswith(
+        ("account_", "socialaccount_")
+    ) or match.view_name == "registrations:register"
 
 
 def _has_preferences(user) -> bool:
@@ -57,7 +65,7 @@ def _has_a_second_way_in(user) -> bool:
 
 def current_hint(request) -> dict | None:
     """The hint to show on this page, or None."""
-    if _on_account_pages(request):
+    if _quiet_here(request):
         return None
     user = request.user
     if not user.is_authenticated:
