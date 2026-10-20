@@ -1,6 +1,6 @@
 {% load i18n %}
 {% comment %}The single setup hint (issue #319); which one, and when, is decided in cycling_site/setup_hints.py.
-No close cross: the sign-in hint cannot be closed at all, and turning a member's reminder off takes a
+No close cross: the sign-in and confirm-email hints cannot be closed at all, and turning a member's reminder off takes a
 link and a confirmation, so it is not swept away by reflex. data-nosnippet keeps the sign-in line,
 which a crawler sees on every page, out of search results.{% endcomment %}
 {% if setup_hint %}
@@ -8,6 +8,7 @@ which a crawler sees on every page, out of search results.{% endcomment %}
      role="region" aria-label="{% trans 'Set the site up for yourself' %}"{% if setup_hint.key == "sign_in" %} data-nosnippet{% endif %}>
     <span class="flex-grow-1">
         {% if setup_hint.key == "sign_in" %}{% trans "Sign in, and the calendar fits you: only your sports and your city, favourites, and entering races in one click." %}
+        {% elif setup_hint.key == "confirm_email" %}{% trans "Confirm your email address: until then you cannot enter races, add events or comment. Look for the letter in your inbox, or send it again from your profile." %}
         {% elif setup_hint.key == "preferences" %}{% trans "Choose your sports and places in your profile, and the calendar, list and map will open with only them." %}
         {% elif setup_hint.key == "registration_data" %}{% trans "Add your name, gender and date of birth to your profile: race entries will be filled in for you." %}
         {% elif setup_hint.key == "signin_methods" %}{% trans "Your account has only one way to sign in. Add a second one, so losing it does not lock you out." %}
@@ -19,8 +20,9 @@ which a crawler sees on every page, out of search results.{% endcomment %}
     <a href="{{ setup_hint.signup_url }}" class="btn btn-sm btn-outline-primary">{% trans "Register" %}</a>
     {% else %}
     <a href="{{ setup_hint.url }}" class="btn btn-sm btn-primary">
-        {% if setup_hint.key == "preferences" %}{% trans "Choose" %}{% elif setup_hint.key == "registration_data" %}{% trans "Fill in" %}{% else %}{% trans "Add" %}{% endif %}
+        {% if setup_hint.key == "confirm_email" %}{% trans "Confirm" %}{% elif setup_hint.key == "preferences" %}{% trans "Choose" %}{% elif setup_hint.key == "registration_data" %}{% trans "Fill in" %}{% else %}{% trans "Add" %}{% endif %}
     </a>
+    {% if setup_hint.dismissible %}
     {% trans "Stop this reminder for good? You can still change it in your profile at any time." as stop_confirm %}
     <form method="post" action="{% url 'account_dismiss_hint' setup_hint.key %}" class="d-inline"
           onsubmit="return confirm('{{ stop_confirm|escapejs }}')">
@@ -28,6 +30,7 @@ which a crawler sees on every page, out of search results.{% endcomment %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
         <button type="submit" class="btn btn-link btn-sm p-0 text-muted">{% trans "Do not remind me again" %}</button>
     </form>
+    {% endif %}
     {% endif %}
 </div>
 {% endif %}

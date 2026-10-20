@@ -106,6 +106,28 @@ class MemberOrderTests(TestCase):
                 self.assertNotContains(self.client.get(reverse(name)), 'id="setup-hint"')
 
 
+class UnconfirmedEmailTests(TestCase):
+    """Signed up but never confirmed: a guest in all but name, and that comes before anything else."""
+
+    def setUp(self):
+        self.user = _member(role=User.Role.GUEST)
+        self.client.force_login(self.user)
+
+    def test_it_comes_first_even_on_the_calendar(self):
+        hint = self.client.get(LIST).context["setup_hint"]
+        self.assertEqual(hint["key"], "confirm_email")
+        self.assertEqual(hint["url"], reverse("account_profile"))
+
+    def test_it_cannot_be_closed(self):
+        self.assertNotContains(self.client.get(NEWS), "return confirm(")
+        response = self.client.post(reverse("account_dismiss_hint", args=["confirm_email"]), {"next": NEWS})
+        self.assertEqual(response.status_code, 404)
+
+    def test_confirmed_members_never_see_it(self):
+        self.client.force_login(_complete(_member(username="ok", email="ok@example.com"), preferences=False))
+        self.assertEqual(self.client.get(LIST).context["setup_hint"]["key"], "preferences")
+
+
 class RaceEntryFormTests(TestCase):
     def test_the_entry_form_is_left_to_say_what_is_missing_itself(self):
         from django.utils import timezone
@@ -179,6 +201,9 @@ class TranslationTests(TestCase):
         "Do not remind me again",
         "Set the site up for yourself",
         "Stop this reminder for good? You can still change it in your profile at any time.",
+        "Confirm your email address: until then you cannot enter races, add events or comment. Look for the "
+        "letter in your inbox, or send it again from your profile.",
+        "Confirm",
     )
 
     def test_every_hint_is_translated(self):
